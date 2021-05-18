@@ -229,14 +229,10 @@ function mouseClick (e) {
         }
         else if (/*!isMoving && !isMouseUp && */(mouseDownX == XY.x && mouseDownY == XY.y) && context.isPointInPath(nd.shapePath, XY.x, XY.y)) {
             isNodeClicked=true
-            var addedNode = prompt("Please enter The node you want to add", "div");
+            var addedNode = prompt("Please enter The node you want to add", "");
             if (addedNode != null) {
-                // let selected = document.getElementsByTagName(nd.n.nodeName)
-                let selected = document.querySelector(nd.n.localName)
-                // closest() // try 
-                alert(selected)
                 let n = document.createElement(addedNode);
-                selected.appendChild(n)
+                nd.n.appendChild(n)
                 context.clearRect(0, 0, canvas.width, canvas.height)
                 indexOnLevel = new Array(100).fill(0)
                 allee = []
