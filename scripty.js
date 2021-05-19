@@ -170,11 +170,6 @@ function recursiveT(node_ = node, y = 100, bigX = 0, bigY = 0, level = -1) {
         node.n = node.n.children[index];
         if (node.n.nodeHasMoved == undefined) node.n.nodeHasMoved = false;
         //-----------------------------
-        // if (node.n.nodeHasMoved && isMouseUp){
-        //     node.n.positionX = mouseUpX
-        //     node.n.positionY = mouseUpY
-        // }
-        // else
          if (!node.n.nodeHasMoved){
             let cellWidth = canvas.width / (getNodesPerLevel(level));
             node.position.x = (cellWidth * indexOnLevel[level]) + cellWidth / 2
@@ -202,7 +197,6 @@ function recursiveT(node_ = node, y = 100, bigX = 0, bigY = 0, level = -1) {
 /////////   events   //////////
 ///////////////////////////////
 function mouseClick (e) { 
-    // console.log("mouseClick")
     e.stopPropagation()
     const XY = getXY(canvas, e)
     for (let nd of allee) {
@@ -227,7 +221,7 @@ function mouseClick (e) {
             else  alert(attr)
             return
         }
-        else if (/*!isMoving && !isMouseUp && */(mouseDownX == XY.x && mouseDownY == XY.y) && context.isPointInPath(nd.shapePath, XY.x, XY.y)) {
+        else if ((mouseDownX == XY.x && mouseDownY == XY.y) && context.isPointInPath(nd.shapePath, XY.x, XY.y)) {
             isNodeClicked=true
             var addedNode = prompt("Please enter The node you want to add", "");
             if (addedNode != null) {
@@ -240,6 +234,7 @@ function mouseClick (e) {
                 isNodeClicked=false;
                 return
             }
+            isNodeClicked=false;
         }
     }
 }
@@ -253,7 +248,6 @@ function loopThroughAllShapes(XY){
 }
 let hasEntered = false
 function mouseMove (e) {
-    console.log(8)
     e.preventDefault();
     e.stopPropagation();
     const XY = getXY(canvas, e)
@@ -266,13 +260,10 @@ function mouseMove (e) {
             context.clearRect(0,0,canvas.width,canvas.height)
             indexOnLevel = new Array(20).fill(0)
             allee = []
-            // level = 0
             recursiveT(node,100,0,0,-1)
             return
     }
     else if(!hasEntered && context.isPointInPath(nd.shapePath, XY.x, XY.y)) { 
-    //    alert(nd.n.innerHTML)
-        // timer = setTimeout(function () {
         hasEntered = true;
         context.fillStyle = "rgba(197 , 210 , 255 , 0.8)";
         var h =10;
@@ -288,40 +279,30 @@ function mouseMove (e) {
         context.fillText(line, XY.x + 10, y);
             y += 18;
         });
-        return;
-    // }, 500);
     }
+    if(hasEntered && isMoving) { 
+        hasEntered = true;
+        nd.n.positionX = XY.x
+        nd.n.positionY = XY.y
+    }
+        return;
 }
 
-var moving = false;
 function mouseDown(e){
-    // console.log("mouseDown")
     const XY = getXY(canvas, e)
     let nd = loopThroughAllShapes(XY)
     if (nd == undefined)return
     else if(context.isPointInPath(nd.shapePath, XY.x, XY.y)) {
-    // context.clearRect(0,0,canvas.width,canvas.height)
-        // isMoving = false;
-        moving=true
+        isMoving=true
         nd.n.nodeHasMoved = true
-        nd.n.positionX = XY.x
-        nd.n.positionY = XY.y
         mouseDownX = XY.x
         mouseDownY = XY.y
-        // context.clearRect(0,0,canvas.width,canvas.height)
-        indexOnLevel = new Array(20).fill(0)
-        allee = []
-        recursiveT(node,100,0,0,-1)
-        return
     }
 }
 function mouseUp(e){
     const XY = getXY(canvas, e)
-    if (mouseDownX != XY.x || mouseDownY != XY.y){
-    moving = false;
+    isMoving = false;
     isMouseUp = true;
-
-    
     mouseUpX = XY.x
     mouseUpY = XY.y
     context.clearRect(0,0,canvas.width,canvas.height)
@@ -332,7 +313,6 @@ function mouseUp(e){
     mouseUpY = 0
     isMouseUp = false
     return
-}
 }
 
 canvas.addEventListener("click", mouseClick);
